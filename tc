@@ -30,8 +30,6 @@ RC='\033[0;31m'
 YC='\033[0;33m'
 NC='\033[0m' # No Color
 
-# changing from ref to the aliases at the same dir as runner script to the current dir search. It's enable having single runner script at the system with the multiple project's aliases
-#_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 _DIR="$(pwd)"
 BASE_DIR="${_DIR}"
 CONFIG_YAML_FILE="${_DIR}/aliases.yaml"
@@ -68,8 +66,6 @@ initProject() {
 }
 
 runTerraform() {
-    # local TF_VERSION=0.12.24
-    # local TF_VERSION=0.13.5
     local TF_ARGS=$@
     if [ -z "${PROJECT_DIR}" ]; then
         echo -e "${RC}Error${NC}: empty project DIR while running ${YC}runTerraform${NC}"
@@ -98,8 +94,6 @@ runTerraformInternal() {
 
 # TODO reuse existing code
 runTerraformInteractive() {
-    # local TF_VERSION=0.12.24
-    # local TF_VERSION=0.13.5
     if [ -z "${PROJECT_DIR}" ]; then
         echo -e "${RC}Error${NC}: empty project DIR while running ${YC}runTerraform${NC}"
         exit 1
@@ -123,8 +117,6 @@ runTerraformInit() {
     cd "${PROJECT_DIR}" && \
         echo -e "Project dir is ${YC}${PROJECT_DIR}${NC} and we are currently right here!" && echo "" && \
         echo -e "${YC} >>> Running TF init ...${NC}" && \
-        # was deprecated since 0.14
-        #runTerraform init .
         runTerraform init
 }
 
@@ -137,9 +129,6 @@ askWorkspace() {
 }
 
 listWorkspaces() {
-    # was deprecated since 0.14
-    #runTerraform workspace list .
-    #
     runTerraformInternal workspace list
 }
 
@@ -165,8 +154,6 @@ selectWorkspace() {
     fi
 
     echo -e "${YC} >>> Selecting TF workspace ${RC}${CURRENT_WORKSPACE}${YC} ... ${NC}"
-    # was deprecated since 0.14
-    #runTerraform workspace select ${CURRENT_WORKSPACE} .
     runTerraform workspace select ${CURRENT_WORKSPACE}
 }
 
@@ -215,26 +202,10 @@ function getYamlConfigValue {
   done
 
   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-  #
-  # extended version from https://stackoverflow.com/a/51789677
-  # just stopped work after upgrade to MacOS Monterey with zsh by default
-  #  sed -ne "s|,$s\]$s\$|]|" \
-  #      -e ":1;s|^\($s\)\($w\)$s:$s\[$s\(.*\)$s,$s\(.*\)$s\]|\1\2: [\3]\n\1  - \4|;t1" \
-  #      -e "s|^\($s\)\($w\)$s:$s\[$s\(.*\)$s\]|\1\2:\n\1  - \3|;p" ${CONFIG_YAML_FILE} | \
-  #  sed -ne "s|,$s}$s\$|}|" \
-  #      -e ":1;s|^\($s\)-$s{$s\(.*\)$s,$s\($w\)$s:$s\(.*\)$s}|\1- {\2}\n\1  \3: \4|;t1" \
-  #      -e    "s|^\($s\)-$s{$s\(.*\)$s}|\1-\n\1  \2|;p" | \
-  #  sed -ne "s|^\($s\):|\1|" \
-  #      -e "s|^\($s\)-$s[\"']\(.*\)[\"']$s\$|\1$fs$fs\2|p" \
-  #      -e "s|^\($s\)-$s\(.*\)$s\$|\1$fs$fs\2|p" \
-  #      -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-  #      -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
-  #
   # shorter version from https://stackoverflow.com/a/21189044
   sed -ne "s|^\($s\):|\1|" \
       -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
       -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
-  #
   # compose list of variables like parent1_parent2_target="target value"
   awk -F$fs '{
       indent = length($1)/2;
@@ -364,11 +335,7 @@ case "${ACTION}" in
 
         # TF validation
         echo -e "${YC} >>> Checking format and validating TF templates ... ${NC}"
-        # was deprecated since 0.14
-        #runTerraform fmt --check=true -recursive -diff .
         runTerraform fmt --check=true -recursive -diff
-        # was deprecated since 0.14
-        #runTerraform validate .
         runTerraform validate
 
         # TF tfvar
@@ -394,8 +361,6 @@ case "${ACTION}" in
         echo -e "\n------------------------------------------------------------------------\n"
         echo -e "${YC} >>> Building TF plan:${NC} alias ${YC}${ALIAS}${NC} / workspace ${RC}${CURRENT_WORKSPACE}${NC} / tfvar ${RC}${TFVARS_FILENAME}${NC}"
         echo -e "\n------------------------------------------------------------------------\n"
-        # was deprecated since 0.14
-        #runTerraform plan ${TFVARS_COMMAND_PARAM} -out=${TF_PLAN_FILENAME} .
         runTerraform plan ${TFVARS_COMMAND_PARAM} -out=${TF_PLAN_FILENAME}
         echo -e "\n${YC} >>> TF plan:${NC} alias ${YC}${ALIAS}${NC} / workspace ${RC}${CURRENT_WORKSPACE}${NC} / tfvar ${RC}${TFVARS_FILENAME}${NC}: was generated plan ${RC}${TF_PLAN_FILENAME}${NC}\n${YC} >>> ${NC}(${TF_PLAN_FILE})\n"
         exit;;
