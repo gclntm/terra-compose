@@ -8,7 +8,14 @@ As a configuration it uses a simple yaml file containing the list of projects an
 
 ### Download
 
-TODO
+For `MacOS` (tested on `Monterey`):
+```shell
+$ wget https://raw.githubusercontent.com/demmonico/terra-compose/master/tc \
+  && chmod +x tc \
+  && ln -s ${PWD}/tc /usr/local/bin/tc
+```
+
+**Note**: wasn't tested for other OS. Feel free to create a MR to add this info or ping me directly. 
 
 ### AWS credentials
 
